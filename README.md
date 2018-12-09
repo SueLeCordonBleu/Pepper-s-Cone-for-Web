@@ -4,7 +4,9 @@ Pepper's Cone for Web _V1
 
 Intro to Computitional Media Final Project 
 
-By: Chunhan Chen Date: 2018-12-09  
+By: Chunhan Chen 
+
+Date: 2018-12-09  
 
 
 
