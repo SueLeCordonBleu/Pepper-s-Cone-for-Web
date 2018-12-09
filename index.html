@@ -1,0 +1,74 @@
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Pepper's Cone Web Version</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <script src="lib/three.js" type="text/javascript"></script>
+    <script src="lib/GLTFLoader.js" type="text/javascript"></script>
+    
+    <!--Vertex Shader code goes here:-->
+    <script  type="x-shader/x-vertex" id="vertexShader">
+      uniform vec4 _TexRotationVec;
+      uniform float _power;
+      uniform float _alpha;
+      uniform sampler2D RenderedTex;
+      uniform sampler2D MapTex;
+      
+      varying vec2 vUv;
+
+      
+      void main() 
+      {
+        vUv = uv;
+        gl_Position = projectionMatrix * modelViewMatrix * vec4 (position, 1.0);
+      }
+    </script>
+    
+    <!--Fragment shader code goes here:-->
+    <script id="fragmentShader" type="x-shader/x-fragment">
+      uniform vec4 _TexRotationVec;
+      uniform highp float _power;
+      uniform highp float _alpha;
+      uniform sampler2D RenderedTex;
+      uniform sampler2D MapTex;
+      
+      varying vec2 vUv;
+
+      bool inside(vec2 uv){
+        const highp float EPS = 0.001;
+        return EPS <= uv.x && uv.x <= float(1)-EPS && EPS <= uv.y && uv.y <= float(1)-EPS;
+      }
+
+      void main()	{
+        const vec4 BLACK = vec4(0, 0, 0, 0);
+        const vec2 HALF = vec2(0.5, 0.5);
+        mat2 rotMat = mat2 (_TexRotationVec.x, _TexRotationVec.y, _TexRotationVec.z, _TexRotationVec.w);
+        vec2 mapUV = rotMat*(vUv-HALF)+HALF;
+        if (!inside(mapUV)) {
+          gl_FragColor = BLACK;
+        }
+
+        vec4 map = texture2D(MapTex, mapUV);
+        vec2 renderedTexUV = vec2(map.x, map.y);
+        if (!inside(renderedTexUV)) {
+          gl_FragColor = BLACK;
+        }
+
+        vec4 temTexture = texture2D(RenderedTex, renderedTexUV);
+        gl_FragColor = _alpha * vec4 (pow(temTexture[0], _power),
+        pow(temTexture[1], _power),
+        pow(temTexture[2], _power),
+        pow(temTexture[3], _power));
+      }
+    </script>
+  </head>
+ 
+  <body>
+      <div id="canvas">
+        <script src="wrapBase.js" type="text/javascript"></script>
+        <script src="mainProject.js" type="text/javascript"></script>
+      </div>
+
+
+</body>
+</html>
